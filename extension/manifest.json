@@ -1,0 +1,16 @@
+{
+    "manifest_version": 3,
+    "name": "Audio Video Recorder",
+    "version": "1.0",
+    "description": "An extension to record audio and video",
+    "permissions": ["activeTab", "storage", "tabs", "sidePanel"],
+    "action": {
+      "default_title": "Open Side Panel"
+    },
+    "side_panel": {
+      "default_path": "sidepanel.html"
+    },
+    "background": {
+      "service_worker": "service-worker.js"
+    }
+  }

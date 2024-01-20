@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body {
+      background-color: #f0f0f0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      height: 100vh;
+      margin: 0;
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+    #preview {
+      width: 100%;
+      height: auto;
+      border-radius: 8px;
+    }
+    button, select {
+      margin-top: 10px;
+      margin-bottom: 10px;
+      padding: 10px 20px;
+      font-size: 16px;
+      border: none;
+      border-radius: 5px;
+      background-color: #4CAF50;
+      color: white;
+      cursor: pointer;
+    }
+    button:hover, select:hover {
+      background-color: #45a049;
+    }
+    h1 {
+      color: #333;
+    }
+    #output {
+      margin-top: 10px;
+      width: 100%;
+      height: 100px;
+      padding: 10px;
+      box-sizing: border-box;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      resize: none;
+    }
+  </style>
+</head>
+<body>
+  <h1>My Recorder</h1>
+  <select id="cameraList"></select>
+  <video id="preview" autoplay></video>
+  <button id="start">Start Session</button>
+  <button id="stop">Stop Session</button>
+  <textarea id="output" readonly></textarea>
+  <script src="stream.js"></script>
+</body>
+</html>
