@@ -75,8 +75,9 @@ def run_model(model_func, model_name):
     result = model_func()
     results[model_name] = result
     
-if __name__ == "__main__":
-    app.run(host = "127.0.0.1", port = 8080, debug=True, threaded=True)
+def create_app():
+    return app
+    #app.run(host = "127.0.0.1", port = 8080, debug=True, threaded=True)
 
 
 
