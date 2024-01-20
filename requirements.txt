@@ -1,0 +1,16 @@
+Flask
+fer
+matplotlib
+keras
+opencv-python
+opencv-contrib-python
+pandas
+Pillow
+requests
+facenet-pytorch
+tqdm
+moviepy
+ffmpeg
+librosa
+my-voice-analysis
+setuptools
