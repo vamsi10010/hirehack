@@ -1,11 +1,15 @@
 from flask import Flask, jsonify, render_template
 import threading
 from google.cloud import storage
+import os
 
 from video import analyze_video
 from audio import analyze_audio
 
+# setting up google cloud
 storage_client = storage.Client()
+os.environ["GOOGLE_API_CREDENTIALS"] = r'./key.json'
+    
 
 threads = []
 
@@ -59,6 +63,9 @@ def aggregated_route():
     for thread in threads:
         if thread != threading.current_thread():
             thread.join()
+
+    #saving the json file
+    
 
     # Display aggregated results
     return jsonify(results)
