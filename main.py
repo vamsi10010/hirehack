@@ -26,4 +26,8 @@ def run_damodel():
         dump + "\n<|recommendations|>"
     })
     
-    return output[0]["generated_text"].split("<|recommendations|>")[1]
+    recs = output[0]["generated_text"].split("<|recommendations|>")[1]
+    
+    print(recs)
+    
+    return recs
