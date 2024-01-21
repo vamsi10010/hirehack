@@ -52,7 +52,7 @@ async function startRecording(videoSource = null) {
       const blobAudio = new Blob(recordedBlobsAudio, { type: optionsAudio.mimeType });
 
       // Send the blobs to the Flask server
-      sendToFlask(blobVideo, blobAudio);
+      sendToGCS(blobVideo, blobAudio);
     });
 
   } catch (error) {
@@ -73,24 +73,6 @@ function handleDataAvailableAudio(event) {
     recordedBlobsAudio.push(event.data);
     console.log(`Received audio data. Size: ${event.data.size} bytes`);
   }
-}
-
-function sendToFlask(blobVideo, blobAudio) {
-  const formData = new FormData();
-  formData.append('video', blobVideo, 'video.webm');
-  formData.append('audio', blobAudio, 'audio.webm');
-
-  fetch('https://hirehack.onrender.com', {
-    method: 'POST',
-    body: formData,
-  })
-    .then(response => response.json())
-    .then(data => {
-      console.log('Response from Flask server:', data);
-    })
-    .catch(error => {
-      console.error('Error:', error);
-    });
 }
 
 async function populateCameraList() {
@@ -114,3 +96,29 @@ async function populateCameraList() {
 }
 
 document.addEventListener('DOMContentLoaded', populateCameraList);
+
+const { Storage } = require('@google-cloud/storage');
+const storage = new Storage();
+
+async function sendToGCS(videoBlob, audioBlob) {
+  // Convert Blobs to File objects
+  const videoFile = new File([videoBlob], 'video.webm');
+  const audioFile = new File([audioBlob], 'audio.webm');
+
+  // Upload files to Google Cloud Storage
+  try {
+    await storage.bucket('video').upload(videoFile, {
+      destination: 'video.webm',
+      public: true,
+    });
+
+    await storage.bucket('audio').upload(audioFile, {
+      destination: 'audio.webm',
+      public: true,
+    });
+
+    console.log('Files uploaded successfully');
+  } catch (error) {
+    console.error('Error:', error);
+  }
+}
