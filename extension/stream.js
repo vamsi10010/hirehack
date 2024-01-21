@@ -46,7 +46,7 @@ async function startRecording(videoSource = null) {
     });
 
     document.querySelector('#stop').addEventListener('click', () => {
-      document.querySelector('#output').textContent = 'Session ended.';
+      // document.querySelector('#output').textContent = 'Session ended.';
       isTimeout = false;
       recognition.stop();
     });
@@ -122,7 +122,7 @@ async function startRecognition() {
       isAudioRecording = true;
       isVideoRecording = true;
       console.log('Recording started.');
-      document.querySelector('#output').textContent = 'Recording started.';
+      // document.querySelector('#output').textContent = 'Recording started.';
     }
   };
 
@@ -137,7 +137,7 @@ async function startRecognition() {
         isAudioRecording = false;
         isVideoRecording = false;
         console.log('Recording stopped.');
-        document.querySelector('#output').textContent = 'Recording ended.';
+        // document.querySelector('#output').textContent = 'Recording ended.';
 
         const blob = new Blob([content], { type: 'text/plain' });
         sendToLocalStorage(blob, 'transcript.txt');
@@ -155,7 +155,7 @@ async function startRecognition() {
                     .catch(error => {
                       console.error('There has been a problem with your fetch operation:', error);
                     });
-        document.querySelector('#output').textContent = rec_vec.content;
+        document.querySelector('#output').textContent = rec_vec.data;
       }
     }, 3000); // Wait for 3 seconds before stopping the recording
   };
