@@ -50,7 +50,7 @@ def run_all_models():
 
 @main.route("/")
 def index():
-    run_all_models()
+    # run_all_models()
     return jsonify({'message': 'All model processing started in the background'})
 
 @main.route("/aggregated")
