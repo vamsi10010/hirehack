@@ -9,6 +9,7 @@ let isAudioRecording = false;
 let isVideoRecording = false;
 let stopTimeout = null;
 let isTimeout = false;
+let content = '';
 
 async function startRecording(videoSource = null) {
   try {
@@ -98,10 +99,15 @@ async function startRecognition() {
     console.log('Recognition service ended');
     if (isTimeout) {
       recognition.start();
-    } else {
-        const blob = new Blob([content], { type: 'text/plain' });
-        sendToLocalStorage(blob, 'transcript.txt');
     }
+  }
+
+  recognition.onresult = function(event) {
+    console.log('Recognition result received');
+    const result = event.results[0][0].transcript;
+    console.log(`Result: ${result}`);
+    content += ' ' + result;
+    recognition.content = content;
   }
 
   recognition.onspeechstart = function() {
@@ -132,11 +138,15 @@ async function startRecognition() {
         isVideoRecording = false;
         console.log('Recording stopped.');
         document.querySelector('#output').textContent = 'Recording ended.';
-        rec_vec = fetch('https://example.com/file.json') // Call the fetch function passing the url of the API as a parameter TODO:
+
+        const blob = new Blob([content], { type: 'text/plain' });
+        sendToLocalStorage(blob, 'transcript.txt');
+
+        rec_vec = fetch('http://127.0.0.1:8080/run', { method: 'get', mode: 'no-cors' }) // Add missing semicolon at the end
                     .then(response => {
-                      if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                      }
+                      // if (!response.ok) {
+                      //   throw new Error('Network response was not ok');
+                      // }
                       return response.json();
                     })
                     .then(data => {

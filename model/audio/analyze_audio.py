@@ -8,7 +8,7 @@ import soundfile as sf
 
 mysp = __import__("my-voice-analysis")
 # path = r"~/Projects/bmxi-test/test/audio_cache" # Path to where your audio file are
-temp_path = r"/c/Users/akhil/OneDrive/Documents/college_related_files/hirehack" # IMPORTANT! drop the "myspsolution.praat" in this folder and this folder path and name does not have spaces.
+temp_path = r"/home/vamsi/Projects/bmxi-test/models/audio" # IMPORTANT! drop the "myspsolution.praat" in this folder and this folder path and name does not have spaces.
 temp_name = "file.wav" # file name of the temp file for conversion.
 
 

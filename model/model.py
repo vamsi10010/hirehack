@@ -65,7 +65,7 @@ class DaModel(nn.Module):
         rec_vector = -output.grad;
         
         # put labels and values into a dictionary
-        recs = {k: v for k, v in zip(labels, rec_vector)}
+        recs = {k: v.item() for k, v in zip(labels, rec_vector)}
         
         return recs
         

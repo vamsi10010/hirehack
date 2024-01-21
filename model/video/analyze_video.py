@@ -31,14 +31,17 @@ def fer_video(video_path):
     for image in images:
         emotions = mtcnn_detector.detect_emotions(image)
         # print(emotions)
+        
+        emotion_averages = None
+        
         try:
             for emotion, value in emotions[0]['emotions'].items():
                 emotion_sums[emotion] += value
                 num_frames += 1
+                
+            emotion_averages = {emotion: value / num_frames for emotion, value in emotion_sums.items()}
         except:
             pass
-            
-    emotion_averages = {emotion: value / num_frames for emotion, value in emotion_sums.items()}
     
     return emotion_averages
         
