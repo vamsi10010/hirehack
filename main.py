@@ -5,16 +5,12 @@ import json
 
 import requests
 
-API_URL = "https://api-inference.huggingface.co/models/mistralai/Mixtral-8x7B-v0.1"
+API_URL = "https://api-inference.huggingface.co/models/HuggingFaceH4/zephyr-7b-beta"
 headers = {"Authorization": "Bearer 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"}
 
 def query(payload):
 	response = requests.post(API_URL, headers=headers, json=payload)
 	return response.json()
-	
-output = query({
-	"inputs": "Can you please let us know more details about your ",
-})
 
 def run_damodel():
     model = DaModel()
@@ -25,4 +21,9 @@ def run_damodel():
     dump = json.dumps(response)
     print(dump)
     
-    return dump
+    output = query({
+        "inputs": "<|instructions|>\nAct like a professional career counselor assisting a student in the middle of their interview. To provide recommendations, you will use the provided JSON string. The JSON string contains information on how each feature should be changed to improve the student's performance. Using the JSON string, come up with short bullets detailing what the student should change in their interview. Make sure the suggestions are sensible and grammatically correct. Here is the JSON string:\n" +
+        dump + "\n<|recommendations|>"
+    })
+    
+    return output[0]["generated_text"].split("<|recommendations|>")[1]
