@@ -10,8 +10,34 @@ threads = []
 
 main = Blueprint('main', __name__)
 
-video_path = "gs://hirehack-2024-data/video/video.mp4"
-audio_path = "gs://hirehack-2024-data/audio/audio.wav"
+from google.cloud import storage
+
+def getData(bucket_name, path):
+    storage_client = storage.Client()
+
+    bucket = storage_client.bucket(bucket_name)
+
+    blobs = bucket.list_blobs()
+
+    files = {}
+    for blob in blobs:
+        if blob.name.endswith('.webm'):
+            local_path = f"{path}/{blob.name}"
+            blob.download_to_filename(local_path)
+            files[blob.name] = local_path
+
+    return files
+
+def uploadFiles(bucket_name, path, file_name):
+    storage_client = storage.Client()
+
+    bucket = storage_client.bucket(bucket_name)
+
+    blob_obj = bucket.blob(file_name)
+
+    blob_obj.upload_from_filename(path)
+
+    print("Files uploaded successfully.")
 
 def fer_model():
     return analyze_video.fer_model(video_path)
