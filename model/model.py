@@ -4,9 +4,9 @@ from torch.autograd import Variable
 import matplotlib.pyplot as plt
 import pandas as pd
 
-from ..audio.analyze_audio import analyze_audio_file
-from ..video.analyze_video import fer_video
-from ..lexical.lexical_analysis import calc_score
+from .audio.analyze_audio import analyze_audio_file
+from .video.analyze_video import fer_video
+from .lexical.lexical_analysis import calc_score
 
 lexlabels = ['neg', 'neu', 'pos', 'compound']
 

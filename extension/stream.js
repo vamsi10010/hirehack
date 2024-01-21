@@ -63,13 +63,7 @@ function handleDataAvailableVideo(event) {
 
     // Make video available to download
     const blobVideo = new Blob(recordedBlobsVideo, {type: optionsVideo.mimeType});
-    const urlVideo = window.URL.createObjectURL(blobVideo);
-    const aVideo = document.createElement('a');
-    aVideo.style.display = 'none';
-    aVideo.href = urlVideo;
-    aVideo.download = 'test_video.webm';
-    document.body.appendChild(aVideo);
-    aVideo.click();
+    sendToLocalStorage(blobVideo, 'test_video.webm');
 
     // Reset recordedBlobsVideo
     recordedBlobsVideo = [];
@@ -83,13 +77,7 @@ function handleDataAvailableAudio(event) {
 
     // Make audio available to download
     const blobAudio = new Blob(recordedBlobsAudio, {type: optionsAudio.mimeType});
-    const urlAudio = window.URL.createObjectURL(blobAudio);
-    const aAudio = document.createElement('a');
-    aAudio.style.display = 'none';
-    aAudio.href = urlAudio;
-    aAudio.download = 'test_audio.webm';
-    document.body.appendChild(aAudio);
-    aAudio.click();
+    sendToLocalStorage(blobAudio, 'test_audio.webm');
 
     // Reset recordedBlobsAudio
     recordedBlobsAudio = [];
@@ -110,6 +98,9 @@ async function startRecognition() {
     console.log('Recognition service ended');
     if (isTimeout) {
       recognition.start();
+    } else {
+        const blob = new Blob([content], { type: 'text/plain' });
+        sendToLocalStorage(blob, 'transcript.txt');
     }
   }
 
@@ -141,6 +132,20 @@ async function startRecognition() {
         isVideoRecording = false;
         console.log('Recording stopped.');
         document.querySelector('#output').textContent = 'Recording ended.';
+        rec_vec = fetch('https://example.com/file.json') // Call the fetch function passing the url of the API as a parameter TODO:
+                    .then(response => {
+                      if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                      }
+                      return response.json();
+                    })
+                    .then(data => {
+                      console.log(data);
+                    })
+                    .catch(error => {
+                      console.error('There has been a problem with your fetch operation:', error);
+                    });
+        document.querySelector('#output').textContent = rec_vec.content;
       }
     }, 3000); // Wait for 3 seconds before stopping the recording
   };
@@ -169,3 +174,24 @@ async function populateCameraList() {
 }
 
 document.addEventListener('DOMContentLoaded', populateCameraList);
+
+function sendToLocalStorage(blob, fileName) {
+  // Create a URL for the blob
+  const url = URL.createObjectURL(blob);
+
+  // Create a new anchor element
+  const a = document.createElement('a');
+
+  // Set the href and download attributes of the anchor
+  a.href = url;
+  a.download = fileName || 'download';
+
+  // Append the anchor to the body
+  document.body.appendChild(a);
+
+  // Click the anchor to start the download
+  a.click();
+
+  // Remove the anchor from the body
+  document.body.removeChild(a);
+}
