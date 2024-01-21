@@ -1,9 +1,8 @@
 import speech_recognition as sr
 
-def transcribe():
+def transcribe(audio_path):
     recognizer = sr.Recognizer()
-    path = "P1_1.wav"
-    with sr.AudioFile(path) as source:
+    with sr.AudioFile(audio_path) as source:
         recorded_audio = recognizer.listen(source)
         try:
             text = recognizer.recognize_google(
