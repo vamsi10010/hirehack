@@ -2,13 +2,8 @@ let mediaRecorderAudio;
 let mediaRecorderVideo;
 let recordedBlobsVideo = [];
 let recordedBlobsAudio = [];
-let optionsVideo = {mimeType: 'video/webm;codecs=vp9'};
-let optionsAudio = {mimeType: 'audio/webm;codecs=opus'};
-let recognition;
-let isAudioRecording = false;
-let isVideoRecording = false;
-let stopTimeout = null;
-let isTimeout = false;
+let optionsVideo = { mimeType: 'video/webm;codecs=vp9' };
+let optionsAudio = { mimeType: 'audio/webm;codecs=opus' };
 
 async function startRecording(videoSource = null) {
   try {
@@ -22,13 +17,11 @@ async function startRecording(videoSource = null) {
 
     document.querySelector('#preview').srcObject = videoStream;
 
-    // let optionsVideo = {mimeType: 'video/webm;codecs=vp9'};
-    // let optionsAudio = {mimeType: 'audio/webm;codecs=opus'};
     if (!MediaRecorder.isTypeSupported(optionsVideo.mimeType)) {
-      optionsVideo = {mimeType: 'video/webm'};
+      optionsVideo = { mimeType: 'video/webm' };
     }
     if (!MediaRecorder.isTypeSupported(optionsAudio.mimeType)) {
-      optionsAudio = {mimeType: 'audio/webm'};
+      optionsAudio = { mimeType: 'audio/webm' };
     }
 
     mediaRecorderVideo = new MediaRecorder(videoStream, optionsVideo);
@@ -40,14 +33,26 @@ async function startRecording(videoSource = null) {
     document.querySelector('#output').textContent = 'Initialized. Ready to record.';
 
     document.querySelector('#start').addEventListener('click', () => {
-      document.querySelector('#output').textContent = 'Session started.';
-      recognition.start();
+      recordedBlobsVideo = [];
+      recordedBlobsAudio = [];
+      mediaRecorderVideo.start();
+      mediaRecorderAudio.start();
+      console.log('Recording started.');
+      document.querySelector('#output').textContent = 'Recording started.';
     });
 
     document.querySelector('#stop').addEventListener('click', () => {
-      document.querySelector('#output').textContent = 'Session ended.';
-      isTimeout = false;
-      recognition.stop();
+      mediaRecorderVideo.stop();
+      mediaRecorderAudio.stop();
+      console.log('Recording stopped by user.');
+      document.querySelector('#output').textContent = 'Recording stopped by user.';
+
+      // Convert recordedBlobsVideo and recordedBlobsAudio to blobs
+      const blobVideo = new Blob(recordedBlobsVideo, { type: optionsVideo.mimeType });
+      const blobAudio = new Blob(recordedBlobsAudio, { type: optionsAudio.mimeType });
+
+      // Send the blobs to the Flask server
+      sendToFlask(blobVideo, blobAudio);
     });
 
   } catch (error) {
@@ -60,19 +65,6 @@ function handleDataAvailableVideo(event) {
   if (event.data && event.data.size > 0) {
     recordedBlobsVideo.push(event.data);
     console.log(`Received video data. Size: ${event.data.size} bytes`);
-
-    // Make video available to download
-    const blobVideo = new Blob(recordedBlobsVideo, {type: optionsVideo.mimeType});
-    const urlVideo = window.URL.createObjectURL(blobVideo);
-    const aVideo = document.createElement('a');
-    aVideo.style.display = 'none';
-    aVideo.href = urlVideo;
-    aVideo.download = 'test_video.webm';
-    document.body.appendChild(aVideo);
-    aVideo.click();
-
-    // Reset recordedBlobsVideo
-    recordedBlobsVideo = [];
   }
 }
 
@@ -80,75 +72,28 @@ function handleDataAvailableAudio(event) {
   if (event.data && event.data.size > 0) {
     recordedBlobsAudio.push(event.data);
     console.log(`Received audio data. Size: ${event.data.size} bytes`);
-
-    // Make audio available to download
-    const blobAudio = new Blob(recordedBlobsAudio, {type: optionsAudio.mimeType});
-    const urlAudio = window.URL.createObjectURL(blobAudio);
-    const aAudio = document.createElement('a');
-    aAudio.style.display = 'none';
-    aAudio.href = urlAudio;
-    aAudio.download = 'test_audio.webm';
-    document.body.appendChild(aAudio);
-    aAudio.click();
-
-    // Reset recordedBlobsAudio
-    recordedBlobsAudio = [];
   }
 }
 
-async function startRecognition() {
-  recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-  recognition.lang = 'en-US';
-  recognition.continuous = false;
-  recognition.interimResults = false;
+function sendToFlask(blobVideo, blobAudio) {
+  const formData = new FormData();
+  formData.append('video', blobVideo, 'video.webm');
+  formData.append('audio', blobAudio, 'audio.webm');
 
-  recognition.onstart = function() {
-    console.log('Recognition service started');
-  }
-
-  recognition.onend = function() {
-    console.log('Recognition service ended');
-    if (isTimeout) {
-      recognition.start();
-    }
-  }
-
-  recognition.onspeechstart = function() {
-    console.log('Speech started event');
-    if (stopTimeout) {
-      clearTimeout(stopTimeout);
-      stopTimeout = null;
-    }
-    if (!isAudioRecording && !isVideoRecording) {
-      mediaRecorderVideo.start();
-      mediaRecorderAudio.start();
-      isAudioRecording = true;
-      isVideoRecording = true;
-      console.log('Recording started.');
-      document.querySelector('#output').textContent = 'Recording started.';
-    }
-  };
-
-  recognition.onspeechend = function() {
-    console.log('Speech ended event');
-    isTimeout = true;
-    stopTimeout = setTimeout(() => {
-      isTimeout = false;
-      if (isAudioRecording && isVideoRecording) {
-        mediaRecorderVideo.stop();
-        mediaRecorderAudio.stop();
-        isAudioRecording = false;
-        isVideoRecording = false;
-        console.log('Recording stopped.');
-        document.querySelector('#output').textContent = 'Recording ended.';
-      }
-    }, 3000); // Wait for 3 seconds before stopping the recording
-  };
+  fetch('https://hirehack.onrender.com', {
+    method: 'POST',
+    body: formData,
+  })
+    .then(response => response.json())
+    .then(data => {
+      console.log('Response from Flask server:', data);
+    })
+    .catch(error => {
+      console.error('Error:', error);
+    });
 }
 
 async function populateCameraList() {
-  await startRecognition();
-
   const devices = await navigator.mediaDevices.enumerateDevices();
   const videoDevices = devices.filter(device => device.kind === 'videoinput');
   const select = document.querySelector('#cameraList');
