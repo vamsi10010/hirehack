@@ -1,6 +1,7 @@
 from flask import Blueprint, redirect, url_for, jsonify, render_template
 import threading
 import os
+import requests
 
 from video import analyze_video
 from audio import analyze_audio
@@ -28,16 +29,10 @@ def getData(bucket_name, path):
 
     return files
 
-def uploadFiles(bucket_name, path, file_name):
-    storage_client = storage.Client()
-
-    bucket = storage_client.bucket(bucket_name)
-
-    blob_obj = bucket.blob(file_name)
-
-    blob_obj.upload_from_filename(path)
-
-    print("Files uploaded successfully.")
+local_app_url = "http://localhost:5000"
+file_to_request = "file name"
+response = requests.get(f"{local_app_url}/get_file/{file_to_request}")
+response.content
 
 def fer_model():
     return analyze_video.fer_model(video_path)
