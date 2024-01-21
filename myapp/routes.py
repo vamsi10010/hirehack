@@ -4,6 +4,7 @@ import os
 
 from video import analyze_video
 from audio import analyze_audio
+from lexical import lexical_analysis
 
 threads = []
 
@@ -19,7 +20,7 @@ def voice_model():
     return analyze_audio.analyze_audio_file(audio_path)
 
 def lexical_model():
-    return {'result': 'lexical_model_result'}
+    return lexical_analysis.calc_score()
 
 # Function to run a model in a separate thread
 def run_model(model_func, model_name):
