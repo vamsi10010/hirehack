@@ -62,7 +62,7 @@ class DaModel(nn.Module):
         loss = loss_fn(self(output), torch.tensor([9], dtype=torch.float32))
         
         loss.backward()
-        rec_vector = -output.grad;
+        rec_vector = output.grad;
         
         # put labels and values into a dictionary
         recs = {k: v.item() for k, v in zip(labels, rec_vector)}

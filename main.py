@@ -22,11 +22,13 @@ def run_damodel():
     print(dump)
     
     output = query({
-        "inputs": "<|instructions|>\nAct like a professional career counselor assisting a student in the middle of their interview. To provide recommendations, you will use the provided JSON string. The JSON string contains information on how each feature should be changed to improve the student's performance. Using the JSON string, come up with short bullets detailing what the student should change in their interview. Make sure the suggestions are sensible and grammatically correct. Here is the JSON string:\n" +
+        "inputs": "<|instructions|>\nAct like a professional career counselor assisting a student in the middle of their interview. To provide recommendations, you will use the provided JSON string. The JSON string contains information on how each feature should be changed to improve the student's performance. If a feature has a positive value, it is recommended to increase that feature. If a feature has a negative value, it is recommended to decrease that feature. Using the JSON string, come up with short bullets detailing what the student should change in their interview. Make sure the suggestions are sensible and understandable by a human. Do not show any numbers in the suggestions. Here is the JSON string:\n" +
         dump + "\n<|recommendations|>"
     })
     
     recs = output[0]["generated_text"].split("<|recommendations|>")[1]
+    
+    print(output)
     
     print(recs)
     
